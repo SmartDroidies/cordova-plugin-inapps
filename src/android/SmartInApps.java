@@ -1,20 +1,13 @@
-package com.smart.droid.firebase;
+package com.smart.droid.inapps;
 
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
-
-import com.google.firebase.analytics.FirebaseAnalytics;
-import com.google.firebase.crash.FirebaseCrash;
-import com.google.firebase.messaging.FirebaseMessaging;
-import com.google.firebase.iid.FirebaseInstanceId;
 
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaPlugin;
@@ -24,27 +17,17 @@ import org.json.JSONObject;
 
 public class SmartInApps extends CordovaPlugin {
 
-    private FirebaseAnalytics mFirebaseAnalytics;
-    private final String TAG = "SmartFirebase";
+    private final String TAG = "SmartInApps";
 
-    public static final String MSG_RECEIVED_BROADCAST_KEY = "MESSAGE_RECEIVED";
-    public static final String LAST_PUSH_KEY = "LAST_PUSH";
 
     @Override
     protected void pluginInitialize() {
         final Context context = this.cordova.getActivity().getApplicationContext();
         this.cordova.getThreadPool().execute(new Runnable() {
             public void run() {
-                //Log.d(TAG, "Starting Firebase plugin");
-                mFirebaseAnalytics = FirebaseAnalytics.getInstance(context);
-                //FirebaseMessaging.getInstance().subscribeToTopic("global");
+                Log.d(TAG, "Starting SmartInApps plugin");
             }
         });
-
-        if (mMessageReceiver != null) {
-            LocalBroadcastManager.getInstance(cordova.getActivity()).registerReceiver(mMessageReceiver,
-                    new IntentFilter(MSG_RECEIVED_BROADCAST_KEY));
-        }
     }
 
     @Override
@@ -78,7 +61,7 @@ public class SmartInApps extends CordovaPlugin {
         cordova.getThreadPool().execute(new Runnable() {
             public void run() {
                 try {
-                    mFirebaseAnalytics.logEvent(key, params);
+                    //mFirebaseAnalytics.logEvent(key, params);
                     callbackContext.success();
                 } catch (Exception e) {
                     callbackContext.error(e.getMessage());
@@ -91,7 +74,7 @@ public class SmartInApps extends CordovaPlugin {
         cordova.getThreadPool().execute(new Runnable() {
             public void run() {
                 try {
-                    FirebaseCrash.report(new Exception(msg));
+                    //FirebaseCrash.report(new Exception(msg));
                     callbackContext.success();
                 } catch (Exception e) {
                     callbackContext.error(e.getMessage());
@@ -105,7 +88,7 @@ public class SmartInApps extends CordovaPlugin {
         cordova.getThreadPool().execute(new Runnable() {
             public void run() {
                 try {
-                    FirebaseMessaging.getInstance().subscribeToTopic(topic);
+                    //FirebaseMessaging.getInstance().subscribeToTopic(topic);
                     callbackContext.success();
                 } catch (Exception e) {
                     callbackContext.error(e.getMessage());
@@ -119,7 +102,7 @@ public class SmartInApps extends CordovaPlugin {
         cordova.getThreadPool().execute(new Runnable() {
             public void run() {
                 try {
-                    FirebaseMessaging.getInstance().unsubscribeFromTopic(topic);
+                    //FirebaseMessaging.getInstance().unsubscribeFromTopic(topic);
                     callbackContext.success();
                 } catch (Exception e) {
                     callbackContext.error(e.getMessage());
@@ -133,7 +116,8 @@ public class SmartInApps extends CordovaPlugin {
         cordova.getThreadPool().execute(new Runnable() {
             public void run() {
                 try {
-                    String token = FirebaseInstanceId.getInstance().getToken();
+                    //String token = FirebaseInstanceId.getInstance().getToken();
+                    String token = null;
                     callbackContext.success(token);
                 } catch (Exception e) {
                     callbackContext.error(e.getMessage());
@@ -157,7 +141,7 @@ public class SmartInApps extends CordovaPlugin {
             //We remove the last saved push since we're sending one.
             SharedPreferences sharedPreferences =
                     PreferenceManager.getDefaultSharedPreferences(cordova.getActivity());
-            sharedPreferences.edit().remove(LAST_PUSH_KEY).apply();
+            //sharedPreferences.edit().remove(LAST_PUSH_KEY).apply();
 
             final String js = "javascript:onNotification(" + JSONObject.quote(data).toString() + ")";
             webView.getEngine().loadUrl(js, false);
@@ -173,17 +157,17 @@ public class SmartInApps extends CordovaPlugin {
             SharedPreferences sharedPreferences =
                     PreferenceManager.getDefaultSharedPreferences(cordova.getActivity());
 
-            String lastPush = sharedPreferences.getString(LAST_PUSH_KEY, null);
-            if (lastPush != null) {
-                sendPushToJavascript(lastPush);
-            }
+            //String lastPush = sharedPreferences.getString(LAST_PUSH_KEY, null);
+            //if (lastPush != null) {
+              //  sendPushToJavascript(lastPush);
+            //}
         }
         return super.onMessage(id, data);
     }
 
     private void unregisterBroadcastReceivers() {
         if (mMessageReceiver != null) {
-            LocalBroadcastManager.getInstance(cordova.getActivity()).unregisterReceiver(mMessageReceiver);
+            //LocalBroadcastManager.getInstance(cordova.getActivity()).unregisterReceiver(mMessageReceiver);
         }
     }
 

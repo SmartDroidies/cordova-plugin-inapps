@@ -32,6 +32,7 @@
         </config-file>
 
         <source-file src="src/android/SmartInApps.java" target-dir="src/com/smart/droid/inapps" />
+        <source-file src="src/android/IInAppBillingService.aidl" target-dir="src/com/android/vending/billing" />
         <!--source-file src="src/android/SmartFirebaseInstanceIDService.java" target-dir="src/com/smart/droid/firebase" />
         <source-file src="src/android/SmartFirebaseMessagingService.java" target-dir="src/com/smart/droid/firebase" />
         <source-file src="src/android/FCMActivity.java" target-dir="src/com/smart/droid/firebase" /-->
