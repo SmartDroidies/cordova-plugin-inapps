@@ -1,0 +1,28 @@
+{
+  "name": "plugin-smart-inapps",
+  "version": "0.0.1",
+  "description": "Integrates with Google Play InApps Services",
+  "cordova": {
+    "id": "cordova-plugin-smart-inapps",
+    "platforms": [
+      "android"
+    ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SmartDroidies/cordova-plugin-inapps.git"
+  },
+  "keywords": [
+    "inapps",
+    "subsciprtion",
+    "products",
+    "ecosystem:cordova",
+    "cordova-android"
+  ],
+  "author": "Prasath Basuvaraj",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/SmartDroidies/cordova-plugin-inapps/issues"
+  },
+  "homepage": "https://github.com/SmartDroidies/cordova-plugin-inapps#readme"
+}

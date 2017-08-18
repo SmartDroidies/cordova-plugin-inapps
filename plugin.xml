@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    id="cordova-plugin-smart-inapps" version="0.0.1">
+    <name>Smart Google InApps Plugin</name>
+    <description>Integrates with Google Play InApps Services</description>
+    <author>SmartDroidies</author>
+    <keywords>inapps,subsciprtion,products</keywords>
+    <license>MIT</license>
+    <js-module src="www/inapps.js" name="InApps">
+    	<clobbers target="InApps" />
+    </js-module>
+    <platform name="android">
+
+        <!--framework src="src/android/build.gradle" custom="true" type="gradleReference" /-->
+        <!--config-file target="res/xml/config.xml" parent="/*">
+          <feature name="SmartFirebase">
+            <param name="android-package" value="com.smart.droid.firebase.SmartFirebase"/>
+            <param name="onload" value="true" />
+          </feature>
+        </config-file-->
+
+        <config-file target="res/xml/config.xml" parent="/*">
+            <feature name="SmartInApps" >
+                <param name="android-package" value="com.smart.droid.inapps.SmartInApps"/>
+            </feature>
+        </config-file>
+
+        <config-file target="AndroidManifest.xml" parent="/manifest">
+            <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+            <uses-permission android:name="com.android.vending.BILLING" />
+        </config-file>
+
+        <source-file src="src/android/SmartInApps.java" target-dir="src/com/smart/droid/inapps" />
+        <!--source-file src="src/android/SmartFirebaseInstanceIDService.java" target-dir="src/com/smart/droid/firebase" />
+        <source-file src="src/android/SmartFirebaseMessagingService.java" target-dir="src/com/smart/droid/firebase" />
+        <source-file src="src/android/FCMActivity.java" target-dir="src/com/smart/droid/firebase" /-->
+    </platform>
+
+    <!--platform name="ios">
+        <config-file target="config.xml" parent="/*">
+          <feature name="SmartFirebase">
+            <param name="ios-package" value="SmartFirebase"/>
+            <param name="onload" value="true" />
+          </feature>
+        </config-file>
+
+        <header-file src="src/ios/SmartFirebase.h" />
+        <source-file src="src/ios/SmartFirebase.m" />
+
+        <header-file src="src/ios/Firebase/Firebase.h" />
+
+        <framework custom="true" src="src/ios/Firebase/Analytics/FirebaseAnalytics.framework" />
+        <framework custom="true" src="src/ios/Firebase/Analytics/FirebaseCore.framework" />
+        <framework custom="true" src="src/ios/Firebase/Analytics/FirebaseInstanceID.framework" />
+        <framework custom="true" src="src/ios/Firebase/Analytics/GoogleToolboxForMac.framework" />
+
+    </platform-->
+
+    <!--hook src="scripts/after_prepare.js" type="after_prepare" /-->
+
+</plugin>   
