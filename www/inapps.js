@@ -4,28 +4,21 @@ var exec = require("cordova/exec");
 
 var InApps = {
 
-    initialize : function (topic, success, error) {
+    initialize : function (success, error) {
         exec(success, error, "SmartInApps", "initialize", []);
+    },
+
+    subscribe : function (productid, success, error) {
+        exec(success, error, "SmartInApps", "subscribe", [productid]);
+    },
+
+    isSubscribed : function (productid, success, error) {
+        exec(success, error, "SmartInApps", "isSubscribed", [productid]);
+    },
+
+    query : function (productid, success, error) {
+        exec(success, error, "SmartInApps", "query", [productid]);  
     }
-
-    /*,
-
-    unsubscribe: function (topic, success, error) {
-        exec(success, error, "SmartFirebase", "unsubscribe", [topic]);
-    },
-
-    event: function(key, value, success, error) {
-    	exec(success, error, "SmartFirebase", "event", [key, value]);
-	},
-
-    exception: function(message, success, error) {
-        exec(success, error, "SmartFirebase", "exception", [message]);
-    },
-
-    getInstanceId: function(success, error) {
-        exec(success, error, "SmartFirebase", "getInstanceId", []);
-    }*/
-
 
 };
 

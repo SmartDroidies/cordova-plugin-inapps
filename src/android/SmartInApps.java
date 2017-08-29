@@ -1,24 +1,26 @@
 package com.smart.droid.inapps;
 
-
-import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.util.Log;
+
+import com.smart.droid.inapps.util.IabHelper;
+import com.smart.droid.inapps.util.IabResult;
+import com.smart.droid.inapps.util.Inventory;
+import com.smart.droid.inapps.util.Purchase;
+import com.smart.droid.inapps.util.SkuDetails;
 
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaPlugin;
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class SmartInApps extends CordovaPlugin {
 
     private final String TAG = "SmartInApps";
-
+    private IabHelper mHelper;
 
     @Override
     protected void pluginInitialize() {
@@ -26,156 +28,140 @@ public class SmartInApps extends CordovaPlugin {
         this.cordova.getThreadPool().execute(new Runnable() {
             public void run() {
                 Log.d(TAG, "Starting SmartInApps plugin");
+                String base64EncodedPublicKey;
+                base64EncodedPublicKey = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAjHgUd91r2exC5mGBjfaZSReHmd4ppLEvDsu7UBBSkjLa2RuCs7umKrXUxGyAavrD7kUW6xd3NBiq9z9c1Y9WgdogExRRQ5wk5ILsOPxXplJL36pDBdsWsbppWRFaN1pacIJXLL4ICtREOOWnpm1cJZsXNISFOUSCC2PT7nsBUWAiCD4/B4V/bAnrxSweJILOe5i3svvke9u902GkOWUb8b/0mt4r/5YGt1nO11IcNH/X8+GDjkET9GYQ2YcN27CHB8fdgkwKUfX7vOMrGLTjPUQaqR/n8zeWlRr/Pf4fuR82hG2Vec6fH+rOoGZZgZfD7EG24dQQsZBIwfjmacXeqwIDAQAB";
+                mHelper = new IabHelper(context, base64EncodedPublicKey);
+                mHelper.startSetup(new IabHelper.OnIabSetupFinishedListener() {
+                    public void onIabSetupFinished(IabResult result) {
+                        if (!result.isSuccess()) {
+                            // Oh no, there was a problem.
+                            Log.d(TAG, "Problem setting up In-app Billing: " + result);
+                        } else {
+                            //Log.d(TAG, "Hooray, IAB is fully set up!");
+                        }
+                    }
+                });
+
             }
         });
+
     }
 
     @Override
     public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
-        if (action.equals("getInstanceId")) {
-            this.getInstanceId(callbackContext);
+        if (action.equals("initialize")) {
+            this.initialize(callbackContext);
             return true;
         } else if (action.equals("subscribe")) {
             this.subscribe(callbackContext, args.getString(0));
             return true;
-        } else if (action.equals("unsubscribe")) {
-            this.unsubscribe(callbackContext, args.getString(0));
+        } else if (action.equals("query")) {
+            this.query(callbackContext, args.getString(0));
             return true;
-        } else if (action.equals("onNotificationOpen")) {
-            //this.registerOnNotificationOpen(callbackContext);
-            return true;
-        } else if (action.equals("event")) {
-            this.trackEvent(callbackContext, args.getString(0), args.getString(1));
-            return true;
-        } else if (action.equals("exception")) {
-            this.trackException(callbackContext, args.getString(0));
+        } else if (action.equals("isSubscribed")) {
+            this.isSubscribed(callbackContext, args.getString(0));
             return true;
         }
         return false;
     }
 
+    private void initialize(final CallbackContext callbackContext) {
+        cordova.getThreadPool().execute(new Runnable() {
+            public void run() {
+                //Log.d(TAG, "Initialize Not required!");
+            }
+        });
+    }
 
-    private void trackEvent(final CallbackContext callbackContext, final String key, final String value) {
-        final Bundle params = new Bundle();
-        params.putString(key, value);
+    private void subscribe(final CallbackContext callbackContext, final String pid) {
+        Log.d(TAG, "Subscribe for InApp products : " + pid);
+        //final String pidt = "android.test.purchased";
         cordova.getThreadPool().execute(new Runnable() {
             public void run() {
                 try {
-                    //mFirebaseAnalytics.logEvent(key, params);
-                    callbackContext.success();
-                } catch (Exception e) {
-                    callbackContext.error(e.getMessage());
+                    mHelper.launchPurchaseFlow(cordova.getActivity(), pid, 10001,
+                            new IabHelper.OnIabPurchaseFinishedListener() {
+                                public void onIabPurchaseFinished(IabResult result, Purchase purchase) {
+                                    if (result.isFailure()) {
+                                        callbackContext.error(result.getResponse());
+                                        //Log.d(TAG, "Error purchasing: " + result);
+                                    } else {
+                                        //Log.d(TAG, "Success purchasing: " + purchase.getSku());
+                                        callbackContext.success();
+                                    }
+                                }
+                            }, "bGoa+V7g/yqDXvKRqq+JTFn4uQZbPiQJo4pf9RzJ");
+                } catch (IabHelper.IabAsyncInProgressException e) {
+                    e.printStackTrace();
+                    callbackContext.error("Failed to subscribe ; " + e.getMessage());
                 }
             }
         });
     }
 
-    private void trackException(final CallbackContext callbackContext, final String msg) {
-        cordova.getThreadPool().execute(new Runnable() {
-            public void run() {
-                try {
-                    //FirebaseCrash.report(new Exception(msg));
-                    callbackContext.success();
-                } catch (Exception e) {
-                    callbackContext.error(e.getMessage());
-                }
-            }
-        });
-    }
+    private void query(final CallbackContext callbackContext, final String productid) {
+        /*cordova.getThreadPool().execute(new Runnable() {
+            public void run() { */
+        List<String> productList = new ArrayList<String>();
+        productList.add(productid);
+        try {
+            mHelper.queryInventoryAsync(true, null, productList,
+                    new IabHelper.QueryInventoryFinishedListener() {
+                        public void onQueryInventoryFinished(IabResult result, Inventory inventory) {
+                            if (result.isFailure()) {
+                                // handle error
+                                return;
+                            }
 
-    private void subscribe(final CallbackContext callbackContext, final String topic) {
-        Log.d(TAG, "Subscribe for topic : " + topic);
-        cordova.getThreadPool().execute(new Runnable() {
-            public void run() {
-                try {
-                    //FirebaseMessaging.getInstance().subscribeToTopic(topic);
-                    callbackContext.success();
-                } catch (Exception e) {
-                    callbackContext.error(e.getMessage());
-                }
-            }
-        });
-    }
+                            SkuDetails subscription = inventory.getSkuDetails(productid);
+                            if (subscription != null) {
+                                Log.d(TAG, "Subscription details : " + subscription.getDescription() + ", " + subscription.getTitle());
+                            } else {
+                                Log.d(TAG, "Subscription is emtpy");
+                            }
 
-    private void unsubscribe(final CallbackContext callbackContext, final String topic) {
-        Log.d(TAG, "UnSubscribe for topic : " + topic);
-        cordova.getThreadPool().execute(new Runnable() {
-            public void run() {
-                try {
-                    //FirebaseMessaging.getInstance().unsubscribeFromTopic(topic);
-                    callbackContext.success();
-                } catch (Exception e) {
-                    callbackContext.error(e.getMessage());
-                }
-            }
-        });
-    }
-
-
-    private void getInstanceId(final CallbackContext callbackContext) {
-        cordova.getThreadPool().execute(new Runnable() {
-            public void run() {
-                try {
-                    //String token = FirebaseInstanceId.getInstance().getToken();
-                    String token = null;
-                    callbackContext.success(token);
-                } catch (Exception e) {
-                    callbackContext.error(e.getMessage());
-                }
-            }
-        });
-    }
-
-    private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            //Log.d(TAG, "Broadcast Message Recieved. Trigger Java Script");
-            sendPushToJavascript(intent.getStringExtra("data"));
+                        }
+                    });
+        } catch (IabHelper.IabAsyncInProgressException e) {
+            e.printStackTrace();
+            callbackContext.error("Failed to get subscription details ; " + e.getMessage());
         }
-    };
-
-    private void sendPushToJavascript(String data) {
-        //Log.d(TAG, "sendPushToJavascript: " + data);
-
-        if (data != null) {
-            //We remove the last saved push since we're sending one.
-            SharedPreferences sharedPreferences =
-                    PreferenceManager.getDefaultSharedPreferences(cordova.getActivity());
-            //sharedPreferences.edit().remove(LAST_PUSH_KEY).apply();
-
-            final String js = "javascript:onNotification(" + JSONObject.quote(data).toString() + ")";
-            webView.getEngine().loadUrl(js, false);
-        }
+            /*}
+        });*/
     }
 
-
-    @Override
-    public Object onMessage(String id, Object data) {
-        if (id.equals("onPageFinished")) {
-            //This here is to catch throw the notification once the app has been down.
-            //TODO: Maybe there is a better place to do this ? or another way to do this ?
-            SharedPreferences sharedPreferences =
-                    PreferenceManager.getDefaultSharedPreferences(cordova.getActivity());
-
-            //String lastPush = sharedPreferences.getString(LAST_PUSH_KEY, null);
-            //if (lastPush != null) {
-              //  sendPushToJavascript(lastPush);
-            //}
+    private void isSubscribed(final CallbackContext callbackContext, final String productid) {
+        List<String> productList = new ArrayList<String>();
+        productList.add(productid);
+        try {
+            mHelper.queryInventoryAsync(true, null, productList,
+                    new IabHelper.QueryInventoryFinishedListener() {
+                        public void onQueryInventoryFinished(IabResult result, Inventory inventory) {
+                            if (result.isFailure()) {
+                                // handle error
+                                callbackContext.error("Failed to get subscription details");
+                            } else {
+                                Log.d(TAG, "Has subscription : " + inventory.hasPurchase(productid));
+                                callbackContext.success("" + inventory.hasPurchase(productid));
+                            }
+                        }
+                    });
+        } catch (IabHelper.IabAsyncInProgressException e) {
+            e.printStackTrace();
+            callbackContext.error("Exception to get subscription details ; " + e.getMessage());
         }
-        return super.onMessage(id, data);
-    }
 
-    private void unregisterBroadcastReceivers() {
-        if (mMessageReceiver != null) {
-            //LocalBroadcastManager.getInstance(cordova.getActivity()).unregisterReceiver(mMessageReceiver);
-        }
     }
 
     @Override
     public void onDestroy() {
-        unregisterBroadcastReceivers();
         super.onDestroy();
+        if (mHelper != null) try {
+            mHelper.dispose();
+            mHelper = null;
+        } catch (IabHelper.IabAsyncInProgressException e) {
+            e.printStackTrace();
+        }
     }
-
 
 }

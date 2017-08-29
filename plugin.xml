@@ -13,16 +13,10 @@
     <platform name="android">
 
         <!--framework src="src/android/build.gradle" custom="true" type="gradleReference" /-->
-        <!--config-file target="res/xml/config.xml" parent="/*">
-          <feature name="SmartFirebase">
-            <param name="android-package" value="com.smart.droid.firebase.SmartFirebase"/>
-            <param name="onload" value="true" />
-          </feature>
-        </config-file-->
-
         <config-file target="res/xml/config.xml" parent="/*">
             <feature name="SmartInApps" >
                 <param name="android-package" value="com.smart.droid.inapps.SmartInApps"/>
+                <param name="onload" value="true" />
             </feature>
         </config-file>
 
@@ -33,9 +27,14 @@
 
         <source-file src="src/android/SmartInApps.java" target-dir="src/com/smart/droid/inapps" />
         <source-file src="src/android/IInAppBillingService.aidl" target-dir="src/com/android/vending/billing" />
-        <!--source-file src="src/android/SmartFirebaseInstanceIDService.java" target-dir="src/com/smart/droid/firebase" />
-        <source-file src="src/android/SmartFirebaseMessagingService.java" target-dir="src/com/smart/droid/firebase" />
-        <source-file src="src/android/FCMActivity.java" target-dir="src/com/smart/droid/firebase" /-->
+        <source-file src="src/android/util/IabBroadcastReceiver.java" target-dir="src/com/smart/droid/inapps/util" />
+        <source-file src="src/android/util/IabException.java" target-dir="src/com/smart/droid/inapps/util" />
+        <source-file src="src/android/util/IabHelper.java" target-dir="src/com/smart/droid/inapps/util" />
+        <source-file src="src/android/util/IabResult.java" target-dir="src/com/smart/droid/inapps/util" />
+        <source-file src="src/android/util/Inventory.java" target-dir="src/com/smart/droid/inapps/util" />
+        <source-file src="src/android/util/Purchase.java" target-dir="src/com/smart/droid/inapps/util" />
+        <source-file src="src/android/util/Security.java" target-dir="src/com/smart/droid/inapps/util" />
+        <source-file src="src/android/util/SkuDetails.java" target-dir="src/com/smart/droid/inapps/util" />
     </platform>
 
     <!--platform name="ios">
